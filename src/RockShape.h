@@ -87,15 +87,7 @@ public:
         float scaled_image_w;
         float scaled_image_h;
         
-        float rock_scale = rh/rw;
-        float image_scale = ih/iw;
-        
-        float scale;
-        if(rock_scale < image_scale) {
-            scale = rock_scale;
-        } else {
-            scale = image_scale;
-        }
+        float scale = rh / rw;
         
         if(ih < iw) {
             scaled_image_h = ih;
@@ -104,32 +96,18 @@ public:
             scaled_image_w = iw;
             scaled_image_h = ih * scale;
         }
+
         
-        float test_h = (rh/rw) * ih;
-        if(test_h < ih) {
-            scaled_image_w = iw;
-            scaled_image_h = (rh/rw) * ih;
-        } else {
-            float test2_w = (ih / rh) * rw;
-            if(test2_w < iw) {
-                scaled_image_w = test2_w;
-                scaled_image_h = ih;
-            } else {
-                float test_h = (iw / rw) * rh;
-                
-            }
-        }
-        
-        ofPoint center = ofPoint(rw/2.0 + min_x, rh/2.0 + min_y);
+        ofPoint center = ofPoint(rw/2.0, rh/2.0);
         ofPoint center_tex = ofPoint(scaled_image_w/2.0, scaled_image_h/2.0);
         
-        printf("image %f, %f scale : %f\n", scaled_image_w, scaled_image_h, scale);
-        printf("m %f, %f %f, %f\n", min_x, max_x, min_y, max_y);
+//        printf("image %f, %f scale : %f\n", scaled_image_w, scaled_image_h, scale);
+//        printf("m %f, %f %f, %f\n", min_x, max_x, min_y, max_y);
         
         for(int i=0; i<points.size(); i++) {
             ofPoint p = points[i];
-            float x1 = ofMap(p.x, min_x, max_x, image_start_pos_x, scaled_image_w);
-            float y1 = ofMap(p.y, min_y, max_y, image_start_pos_y, scaled_image_h);
+            float x1 = ofMap(p.x, min_x, max_x, 0, scaled_image_w);
+            float y1 = ofMap(p.y, min_y, max_y, 0, scaled_image_h);
             ofPoint o = ofPoint(x1, y1);
             
             mesh.addVertex(center);
@@ -160,16 +138,25 @@ public:
         mesh.clearVertices();
         
         
+        min_x = 100000;
+        min_y = 100000;
+        max_x = -1;
+        max_y = -1;
         vector<ofPoint> &pts = polyShape.getPoints();
+        for(int i=0; i<pts.size(); i++) {
+            ofPoint point = pts[i];
+            if(point.x < min_x ) min_x = point.x;
+            if(point.y < min_y ) min_y = point.y;
+            if(max_x < point.x) max_x = point.x;
+            if(max_y < point.y) max_y = point.y;
+        }
+                
+        float iw = texture.getWidth();
+        float ih = texture.getHeight();
+        float rw = max_x - min_x;
+        float rh = max_y - min_y;
         
-        ofPoint f = pts[0];
-        
-        int x_diff = max_x - min_x;
-        int y_diff = max_y - min_y;
-        
-        ofPoint first = ofPoint(f.x, f.y);
-        
-        ofPoint center = polyShape.getCentroid2D();
+        ofPoint center = ofPoint(min_x + rw/2.0, min_y + rh/2.0);
         
         for (int i=0; i<pts.size(); i++) {
             mesh.addVertex(center);
