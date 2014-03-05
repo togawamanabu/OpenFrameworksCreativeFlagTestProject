@@ -1,0 +1,3 @@
+ofxSvg
+ofxXmlSettings
+ofxBox2d
