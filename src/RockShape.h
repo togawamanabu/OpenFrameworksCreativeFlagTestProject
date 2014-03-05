@@ -198,28 +198,22 @@ public:
             float rw = max_x - min_x;
             float rh = max_y - min_y;
             
-            float scale;
-            //scale = rh / rw;
-            
-            if(rh < rw) {
-                scale = rh / rw;
-            } else {
-                scale = rw / rh;
-            }
+            float scale = rh / rw;
             
             float image_start_pos_x = 0;
             float image_start_pos_y = 0;
             float image_end_pos_x = iw;
             float image_end_pos_y = ih;
             
-            float scaled_image_w = iw;
-            float scaled_image_h = ih;
+            float scaled_image_w;
+            float scaled_image_h;
             
-            ofNoFill();
             if(ih < iw) {
+                scaled_image_h = ih;
                 scaled_image_w = iw * scale;
             } else {
-                scaled_image_h = ih* scale;
+                scaled_image_w = iw;
+                scaled_image_h = ih * scale;
             }
             ofPoint center_tex = ofPoint(scaled_image_w/2.0, scaled_image_h/2.0);
             ofRect(0, 0, scaled_image_w, scaled_image_h);
