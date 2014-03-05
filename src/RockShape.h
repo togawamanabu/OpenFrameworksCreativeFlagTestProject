@@ -96,9 +96,8 @@ public:
             scaled_image_w = iw;
             scaled_image_h = ih * scale;
         }
-
         
-        ofPoint center = ofPoint(rw/2.0, rh/2.0);
+        ofPoint center = polyShape.getCentroid2D();
         ofPoint center_tex = ofPoint(scaled_image_w/2.0, scaled_image_h/2.0);
         
 //        printf("image %f, %f scale : %f\n", scaled_image_w, scaled_image_h, scale);
@@ -137,26 +136,9 @@ public:
     void draw(int pos_x, int pos_y) {
         mesh.clearVertices();
         
-        
-        min_x = 100000;
-        min_y = 100000;
-        max_x = -1;
-        max_y = -1;
         vector<ofPoint> &pts = polyShape.getPoints();
-        for(int i=0; i<pts.size(); i++) {
-            ofPoint point = pts[i];
-            if(point.x < min_x ) min_x = point.x;
-            if(point.y < min_y ) min_y = point.y;
-            if(max_x < point.x) max_x = point.x;
-            if(max_y < point.y) max_y = point.y;
-        }
-                
-        float iw = texture.getWidth();
-        float ih = texture.getHeight();
-        float rw = max_x - min_x;
-        float rh = max_y - min_y;
         
-        ofPoint center = ofPoint(min_x + rw/2.0, min_y + rh/2.0);
+        ofPoint center = polyShape.getCentroid2D();
         
         for (int i=0; i<pts.size(); i++) {
             mesh.addVertex(center);
