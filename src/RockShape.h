@@ -54,7 +54,7 @@ public:
                 ofPolyline pl = vpl[z];
                 vector<ofPoint> vp = pl.getVertices();
                 
-                int step = vp.size() / 5; //TODO:20
+                int step = vp.size() / 8; //TODO:20
                 
                 for(int x=0; x<vp.size(); x = x+step) {
                     float d = ofRandom(0, 20);
@@ -119,29 +119,28 @@ public:
         ofPoint center = polyShape.getCentroid2D();
         ofPoint center_tex = ofPoint(iw/2.0, ih/2.0);
         
-        for(int i=0; i<points.size(); i++) {
-            ofPoint p = points[i];
-            float x1 = ofMap(p.x, min_x, max_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
-            float y1 = ofMap(p.y, min_y, max_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
-            ofPoint o = ofPoint(x1, y1);
+        vector<ofPoint> &pts = polyShape.getPoints();
+        
+        for(int i=0; i<pts.size(); i++) {
+            ofPoint p = pts[i];
+            float x1 = ofMap(p.x - min_x, 0, max_x - min_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
+            float y1 = ofMap(p.y - min_y, 0, max_y - min_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
+            ofPoint o = ofPoint(x1,  y1);
             
             mesh.addVertex(center);
             mesh.addVertex(p);
             
             mesh.addTexCoord(center_tex);
             mesh.addTexCoord(o);
-            
-            
-            printf("ver %i : %f, %f, %f, %f\n", i, center.x, center.y, p.x, p.y);
-            printf("tex %i : %f, %f, %f, %f\n", i, center_tex.x, center_tex.y, o.x, o.y);
+
         }
         mesh.addVertex(center);
         mesh.addVertex(points.front());
         
         mesh.addTexCoord(center_tex);
         ofPoint p = points.front();
-        float x1 = ofMap(p.x, min_x, max_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
-        float y1 = ofMap(p.y, min_y, max_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
+        float x1 = ofMap(p.x - min_x, 0, max_x - min_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
+        float y1 = ofMap(p.y - min_y, 0, max_y - min_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
         mesh.addTexCoord(ofPoint(x1, y1));
         
         polyShape.setPhysics(10, 0.3, 0.1);
