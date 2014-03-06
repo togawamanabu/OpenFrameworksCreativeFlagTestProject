@@ -72,60 +72,60 @@ public:
             }
         }
         
-        float iw = texture.getWidth();
-        float ih = texture.getHeight();
-        float rw = max_x - min_x;
-        float rh = max_y - min_y;
-        
-        
-        float image_start_pos_x = 0;
-        float image_start_pos_y = 0;
-        float image_end_pos_x = iw;
-        float image_end_pos_y = ih;
-        
-        float scaled_image_w;
-        float scaled_image_h;
-        
-        float scale;
-        if(rh < rw) {
-            float scale = rh / rw;
-            if(iw * scale < ih) {
-                scaled_image_h = iw * scale;
-                scaled_image_w = iw;
-                image_start_pos_x = 0;
-                image_start_pos_y = (ih - scaled_image_h) / 2.0;
-            } else {
-                scaled_image_h = ih;
-                scaled_image_w = ih / scale;
-                image_start_pos_x = (iw - scaled_image_w) / 2.0;
-                image_start_pos_y = 0;
-            }
-        } else {
-            float scale = rw / rh;
-            if(ih * scale < iw) {
-                scaled_image_w = ih * scale;
-                scaled_image_h = ih;
-                image_start_pos_x = (iw - scaled_image_w) / 2.0;
-                image_start_pos_y = 0;
-            } else {
-                scaled_image_w = iw;
-                scaled_image_h = iw / scale;
-                image_start_pos_x = 0;
-                image_start_pos_y = (ih - scaled_image_h) / 2.0;
-            }
-        }
+//        float iw = texture.getWidth();
+//        float ih = texture.getHeight();
+//        float rw = max_x - min_x;
+//        float rh = max_y - min_y;
+//        
+//        
+//        float image_start_pos_x = 0;
+//        float image_start_pos_y = 0;
+//        float image_end_pos_x = iw;
+//        float image_end_pos_y = ih;
+//        
+//        float scaled_image_w;
+//        float scaled_image_h;
+//        
+//        float scale;
+//        if(rh < rw) {
+//            float scale = rh / rw;
+//            if(iw * scale < ih) {
+//                scaled_image_h = iw * scale;
+//                scaled_image_w = iw;
+//                image_start_pos_x = 0;
+//                image_start_pos_y = (ih - scaled_image_h) / 2.0;
+//            } else {
+//                scaled_image_h = ih;
+//                scaled_image_w = ih / scale;
+//                image_start_pos_x = (iw - scaled_image_w) / 2.0;
+//                image_start_pos_y = 0;
+//            }
+//        } else {
+//            float scale = rw / rh;
+//            if(ih * scale < iw) {
+//                scaled_image_w = ih * scale;
+//                scaled_image_h = ih;
+//                image_start_pos_x = (iw - scaled_image_w) / 2.0;
+//                image_start_pos_y = 0;
+//            } else {
+//                scaled_image_w = iw;
+//                scaled_image_h = iw / scale;
+//                image_start_pos_x = 0;
+//                image_start_pos_y = (ih - scaled_image_h) / 2.0;
+//            }
+//        }
     
         
         ofPoint center = polyShape.getCentroid2D();
-        ofPoint center_tex = ofPoint(iw/2.0, ih/2.0);
+//        ofPoint center_tex = ofPoint(iw/2.0, ih/2.0);
         
         vector<ofPoint> &pts = polyShape.getPoints();
         
         for(int i=0; i<pts.size(); i++) {
             ofPoint p = pts[i];
-            float x1 = ofMap(p.x - min_x, 0, max_x - min_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
-            float y1 = ofMap(p.y - min_y, 0, max_y - min_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
-            ofPoint o = ofPoint(x1,  y1);
+//            float x1 = ofMap(p.x - min_x, 0, max_x - min_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
+ //           float y1 = ofMap(p.y - min_y, 0, max_y - min_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
+//            ofPoint o = ofPoint(x1,  y1);
             
             mesh.addVertex(center);
             mesh.addVertex(p);
