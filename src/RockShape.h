@@ -11,8 +11,6 @@
 #include "ofxBox2d.h"
 #include "ofxSvg.h"
 
-static int hexColors[4] = {0x31988A, 0xFDB978, 0xFF8340, 0xE8491B};
-
 class RockShape {
     
 public:
@@ -178,11 +176,11 @@ public:
             float scaled_image_h;
             
             if(ih < iw) {
-                scaled_image_h = ih;
-                scaled_image_w = iw * scale;
-            } else {
-                scaled_image_w = iw;
                 scaled_image_h = ih * scale;
+                scaled_image_w = iw;
+            } else {
+                scaled_image_w = iw * scale;
+                scaled_image_h = ih;
             }
             ofPoint center_tex = ofPoint(scaled_image_w/2.0, scaled_image_h/2.0);
             ofRect(0, 0, scaled_image_w, scaled_image_h);

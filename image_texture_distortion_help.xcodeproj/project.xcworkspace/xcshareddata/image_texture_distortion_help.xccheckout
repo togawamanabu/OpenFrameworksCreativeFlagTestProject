@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>07218C4B-5AE7-465B-97A8-655CF43F5820</string>
+	<key>IDESourceControlProjectName</key>
+	<string>image_texture_distortion_help</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>125C34C2-C905-4BD9-8696-25E6FE97B889</key>
+		<string>https://github.com/togawamanabu/of_test.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>image_texture_distortion_help.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>125C34C2-C905-4BD9-8696-25E6FE97B889</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/togawamanabu/of_test.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>125C34C2-C905-4BD9-8696-25E6FE97B889</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>125C34C2-C905-4BD9-8696-25E6FE97B889</string>
+			<key>IDESourceControlWCCName</key>
+			<string>image_texture_distortion_help</string>
+		</dict>
+	</array>
+</dict>
+</plist>
