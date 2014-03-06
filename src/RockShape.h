@@ -309,23 +309,30 @@ public:
         ofPoint texCenter = ofPoint(iw/2.0, ih/2.0);
         for(int i=0; i<pts.size(); i++) {
             ofPoint p = pts[i];
-            float dx = p.x- vecCenter.x;
-            float dy = p.y - vecCenter.y;
-            float d = sqrt(dx*dx + dy*dy);
-            float t = atan( dy / dx );
-            float deg = 180.0 * t / PI;
+            float dx = (p.x- vecCenter.x)/2.0;
+            float dy = (p.y - vecCenter.y)/2.0;
+//            float d = sqrt(dx*dx + dy*dy);
+//            float t = atan( dy / dx );
+//            float deg = 180.0 * t / PI;
+//            
+//            float x = dx; //cos(t) * d ;
+//            float y = dy; //sin(t) * d ;
             
-            float x = cos(t) * d;
-            float y = sin(t) * d;
             
-            
-            float tx = texCenter.x + ofMap(x, -rw/2.0, rw/2.0, -iw/2.0, iw/2.0);
-            float ty = texCenter.y + ofMap(y, -rh/2.0, rh/2.0, -ih/2.0, ih/2.0);
+            float tx = texCenter.x + ofMap(dx, -rw/2.0, rw/2.0, -iw/2.0, iw/2.0);
+            float ty = texCenter.y + ofMap(dy, -rh/2.0, rh/2.0, -ih/2.0, ih/2.0);
             
             mesh.addTexCoord(texCenter);
             mesh.addTexCoord(ofPoint(tx, ty));
         }
         
+        ofPoint p = pts.front();
+        float dx = (p.x- vecCenter.x)/2.0;
+        float dy = (p.y - vecCenter.y)/2.0;
+        float tx = texCenter.x + ofMap(dx, -rw/2.0, rw/2.0, -iw/2.0, iw/2.0);
+        float ty = texCenter.y + ofMap(dy, -rh/2.0, rh/2.0, -ih/2.0, ih/2.0);
+        mesh.addTexCoord(texCenter);
+        mesh.addTexCoord(ofPoint(tx, ty));
         
     }
     
