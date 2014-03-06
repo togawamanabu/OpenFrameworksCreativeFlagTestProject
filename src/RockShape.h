@@ -28,9 +28,6 @@ public:
     
     ofTexture texture;
     
-    float min_x, min_y, max_x, max_y;
-    float center_diff_x, center_diff_y;
-    
 	void setup(ofxBox2d &world, float cx, float cy, ofxSVG * _svg, ofImage * _image) {
         svg = _svg;
         image = _image;
@@ -56,25 +53,25 @@ public:
                     ofPoint point = ofPoint(vp[x].x + cx , vp[x].y + cy);
                     
                     polyShape.addVertex(point);
-                    
                     points.push_back(point);
                 }
             }
         }
         
+        float min_x, max_x, min_y, max_y;
+        calcMinMaxPos(min_x, max_x, min_y, max_y);
+        ofPoint center = getCenter(min_x, max_x, min_y, max_y);
         
-        ofPoint center = polyShape.getCentroid2D();
         vector<ofPoint> &pts = polyShape.getPoints();
         
         for(int i=0; i<pts.size(); i++) {
             ofPoint p = pts[i];
-
             mesh.addVertex(center);
             mesh.addVertex(p);
 
         }
         mesh.addVertex(center);
-        mesh.addVertex(points.front());
+        mesh.addVertex(pts.front());
         
         createTextureMap();
         
@@ -85,8 +82,11 @@ public:
     void draw(int pos_x, int pos_y) {
         mesh.clearVertices();
         
+        float min_x, max_x, min_y, max_y;
+        calcMinMaxPos(min_x, max_x, min_y, max_y);
+        ofPoint center = getCenter(min_x, max_x, min_y, max_y);
+        
         vector<ofPoint> &pts = polyShape.getPoints();
-        ofPoint center =  polyShape.getCentroid2D();
         
         for (int i=0; i<pts.size(); i++) {
             mesh.addVertex(center);
@@ -95,15 +95,15 @@ public:
         mesh.addVertex(center);
         mesh.addVertex(pts.front());
         
-        
         ofSetColor(255, 255, 255);
         texture.bind();
         mesh.draw();
         texture.unbind();
         mesh.drawWireframe();
         
+        
+        //for debug
         if(polyShape.inside(pos_x, pos_y)) {
-            
             
             // texture test
             texture.draw(0, 0);
@@ -162,10 +162,6 @@ public:
             
             ofCircle(center.x, center.y, 10);
         }
-        
-//        ofPoint screenCenter = ofPoint(ofGetWidth() / 2.0, ofGetHeight() / 2.0);
-//        ofLine(screenCenter.x, screenCenter.y, center.x, center.y);
-        
     }
     
     
@@ -173,24 +169,10 @@ public:
         mesh.clearTexCoords();
         
         vector<ofPoint> &pts = polyShape.getPoints();
-        ofPoint vecCenter = polyShape.getCentroid2D();
-        float min_x = 10000;
-        float max_x = -1;
-        float min_y = 100000;
-        float max_y = -1;
-        float min_dist = 100000;
-        float max_dist =-1;
-        for(int i=0; i<pts.size(); i++) {
-            ofPoint p = pts[i];
-            float d = (p.x - vecCenter.x)*(p.x - vecCenter.x) + (p.y - vecCenter.y)*(p.y - vecCenter.y);
-            
-            if(p.x < min_x ) min_x = p.x;
-            if(p.y < min_y ) min_y = p.y;
-            if(max_x < p.x) max_x = p.x;
-            if(max_y < p.y) max_y = p.y;
-            if(d < min_dist) min_dist = d;
-            if(max_dist < d) max_dist = d;
-        }
+        
+        float min_x, max_x, min_y, max_y;
+        calcMinMaxPos(min_x, max_x, min_y, max_y);
+        ofPoint vecCenter = getCenter(min_x, max_x, min_y, max_y);
         
         float rw = max_x - min_x;
         float rh = max_y - min_y;
@@ -218,34 +200,51 @@ public:
             }
         }
         
+        printf("center_x %f, center_y %f, mm_center_x %f, mm_center_y %f\n ", vecCenter.x, vecCenter.y, (max_x - min_x)/2.0 + min_x, (max_y - min_y)/2.0 + min_y);
+        
+        bool isfirst = true;
+        float first_tx, first_ty;
         ofPoint texCenter = ofPoint(iw/2.0, ih/2.0);
         for(int i=0; i<pts.size(); i++) {
             ofPoint p = pts[i];
             float dx = (p.x- vecCenter.x);
             float dy = (p.y - vecCenter.y);
-//            float d = sqrt(dx*dx + dy*dy);
-//            float t = atan( dy / dx );
-//            float deg = 180.0 * t / PI;
-//            
-//            float x = dx; //cos(t) * d ;
-//            float y = dy; //sin(t) * d ;
-            
             
             float tx = texCenter.x + ofMap(dx, -rw/2.0, rw/2.0, -scaled_w/2.0, scaled_w/2.0);
             float ty = texCenter.y + ofMap(dy, -rh/2.0, rh/2.0, -scaled_h/2.0, scaled_h/2.0);
             
             mesh.addTexCoord(texCenter);
             mesh.addTexCoord(ofPoint(tx, ty));
+            
+            if(isfirst) {
+                first_tx = tx;
+                first_ty = ty;
+                isfirst = false;
+            }
         }
-        
-        ofPoint p = pts.front();
-        float dx = (p.x- vecCenter.x)/2.0;
-        float dy = (p.y - vecCenter.y)/2.0;
-        float tx = texCenter.x + ofMap(dx, -rw/2.0, rw/2.0, -scaled_w/2.0, scaled_w/2.0);
-        float ty = texCenter.y + ofMap(dy, -rh/2.0, rh/2.0, -scaled_h/2.0, scaled_h/2.0);
         mesh.addTexCoord(texCenter);
-        mesh.addTexCoord(ofPoint(tx, ty));
+        mesh.addTexCoord(ofPoint(first_tx, first_ty));
         
+    }
+    
+    void calcMinMaxPos(float &min_x, float &max_x, float &min_y, float &max_y) {
+        min_x = 10000;
+        max_x = -1;
+        min_y = 100000;
+        max_y = -1;
+        vector<ofPoint> &pts = polyShape.getPoints();
+        
+        for(int i=0; i<pts.size(); i++) {
+            ofPoint p = pts[i];
+            if(p.x < min_x ) min_x = p.x;
+            if(p.y < min_y ) min_y = p.y;
+            if(max_x < p.x) max_x = p.x;
+            if(max_y < p.y) max_y = p.y;
+        }
+    }
+    
+    ofPoint getCenter(float min_x, float max_x, float min_y, float max_y) {
+        return ofPoint(min_x + (max_x - min_x)/2.0, min_y + (max_y - min_y)/2.0);
     }
 
     
