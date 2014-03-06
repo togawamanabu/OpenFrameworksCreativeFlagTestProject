@@ -39,11 +39,6 @@ public:
         
         mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
         
-        min_x = 100000;
-        min_y = 100000;
-        max_x = -1;
-        max_y = -1;
-        
         for (int i = 0;i < svg->getNumPath();i++){
             ofPath p = svg->getPathAt(i);
             p.setPolyWindingMode(OF_POLY_WINDING_ODD);
@@ -54,7 +49,7 @@ public:
                 ofPolyline pl = vpl[z];
                 vector<ofPoint> vp = pl.getVertices();
                 
-                int step = vp.size() / 8; //TODO:20
+                int step = vp.size() / 20; //TODO:20
                 
                 for(int x=0; x<vp.size(); x = x+step) {
                     float d = ofRandom(0, 20);
@@ -63,85 +58,23 @@ public:
                     polyShape.addVertex(point);
                     
                     points.push_back(point);
-                    
-                    if(point.x < min_x ) min_x = point.x;
-                    if(point.y < min_y ) min_y = point.y;
-                    if(max_x < point.x) max_x = point.x;
-                    if(max_y < point.y) max_y = point.y;
                 }
             }
         }
         
-//        float iw = texture.getWidth();
-//        float ih = texture.getHeight();
-//        float rw = max_x - min_x;
-//        float rh = max_y - min_y;
-//        
-//        
-//        float image_start_pos_x = 0;
-//        float image_start_pos_y = 0;
-//        float image_end_pos_x = iw;
-//        float image_end_pos_y = ih;
-//        
-//        float scaled_image_w;
-//        float scaled_image_h;
-//        
-//        float scale;
-//        if(rh < rw) {
-//            float scale = rh / rw;
-//            if(iw * scale < ih) {
-//                scaled_image_h = iw * scale;
-//                scaled_image_w = iw;
-//                image_start_pos_x = 0;
-//                image_start_pos_y = (ih - scaled_image_h) / 2.0;
-//            } else {
-//                scaled_image_h = ih;
-//                scaled_image_w = ih / scale;
-//                image_start_pos_x = (iw - scaled_image_w) / 2.0;
-//                image_start_pos_y = 0;
-//            }
-//        } else {
-//            float scale = rw / rh;
-//            if(ih * scale < iw) {
-//                scaled_image_w = ih * scale;
-//                scaled_image_h = ih;
-//                image_start_pos_x = (iw - scaled_image_w) / 2.0;
-//                image_start_pos_y = 0;
-//            } else {
-//                scaled_image_w = iw;
-//                scaled_image_h = iw / scale;
-//                image_start_pos_x = 0;
-//                image_start_pos_y = (ih - scaled_image_h) / 2.0;
-//            }
-//        }
-    
         
         ofPoint center = polyShape.getCentroid2D();
-//        ofPoint center_tex = ofPoint(iw/2.0, ih/2.0);
-        
         vector<ofPoint> &pts = polyShape.getPoints();
         
         for(int i=0; i<pts.size(); i++) {
             ofPoint p = pts[i];
-//            float x1 = ofMap(p.x - min_x, 0, max_x - min_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
- //           float y1 = ofMap(p.y - min_y, 0, max_y - min_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
-//            ofPoint o = ofPoint(x1,  y1);
-            
+
             mesh.addVertex(center);
             mesh.addVertex(p);
-            
-//            mesh.addTexCoord(center_tex);
-//            mesh.addTexCoord(o);
 
         }
         mesh.addVertex(center);
         mesh.addVertex(points.front());
-        
-//        mesh.addTexCoord(center_tex);
-//        ofPoint p = points.front();
-//        float x1 = ofMap(p.x - min_x, 0, max_x - min_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
-//        float y1 = ofMap(p.y - min_y, 0, max_y - min_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
-//        mesh.addTexCoord(ofPoint(x1, y1));
         
         createTextureMap();
         
@@ -153,20 +86,7 @@ public:
         mesh.clearVertices();
         
         vector<ofPoint> &pts = polyShape.getPoints();
-        
-        min_x = 100000;
-        min_y = 100000;
-        max_x = -1;
-        max_y = -1;
-        for(int i=0;i<pts.size(); i++) {
-            ofPoint point = pts[i];
-            if(point.x < min_x ) min_x = point.x;
-            if(point.y < min_y ) min_y = point.y;
-            if(max_x < point.x) max_x = point.x;
-            if(max_y < point.y) max_y = point.y;
-        }
-        
-        ofPoint center =  polyShape.getCentroid2D(); // ofPoint(min_x + (max_x - min_x) / 2.0, min_y + (max_y - min_y) / 2.0);
+        ofPoint center =  polyShape.getCentroid2D();
         
         for (int i=0; i<pts.size(); i++) {
             mesh.addVertex(center);
@@ -174,7 +94,6 @@ public:
         }
         mesh.addVertex(center);
         mesh.addVertex(pts.front());
-        
         
         
         ofSetColor(255, 255, 255);
@@ -309,8 +228,8 @@ public:
         ofPoint texCenter = ofPoint(iw/2.0, ih/2.0);
         for(int i=0; i<pts.size(); i++) {
             ofPoint p = pts[i];
-            float dx = (p.x- vecCenter.x)/2.0;
-            float dy = (p.y - vecCenter.y)/2.0;
+            float dx = (p.x- vecCenter.x);
+            float dy = (p.y - vecCenter.y);
 //            float d = sqrt(dx*dx + dy*dy);
 //            float t = atan( dy / dx );
 //            float deg = 180.0 * t / PI;
@@ -335,10 +254,7 @@ public:
         mesh.addTexCoord(ofPoint(tx, ty));
         
     }
-    
-    void setTexture() {
-        
-    }
+
     
     void destroy() {
         polyShape.destroy();
