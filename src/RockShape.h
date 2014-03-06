@@ -169,8 +169,6 @@ public:
             
             float image_start_pos_x = 0;
             float image_start_pos_y = 0;
-            float image_end_pos_x = iw;
-            float image_end_pos_y = ih;
             
             float scaled_image_w;
             float scaled_image_h;
@@ -178,16 +176,18 @@ public:
             if(ih < iw) {
                 scaled_image_h = ih * scale;
                 scaled_image_w = iw;
+                image_start_pos_y = ih - scaled_image_h;
             } else {
                 scaled_image_w = iw * scale;
                 scaled_image_h = ih;
+                image_start_pos_x = iw - scaled_image_w;
             }
             ofPoint center_tex = ofPoint(scaled_image_w/2.0, scaled_image_h/2.0);
             ofRect(0, 0, scaled_image_w, scaled_image_h);
             
             for(int i=0;i<points.size();i++) {
                 ofPoint p = ofPoint(points[i].x, points[i].y);
-                ofPoint o = ofPoint(ofMap(p.x, min_x, max_x, 0, scaled_image_w) , ofMap(p.y, min_y, max_y, 0, scaled_image_h) );
+                ofPoint o = ofPoint(ofMap(p.x, min_x, max_x, image_start_pos_x, image_start_pos_x + scaled_image_w) , ofMap(p.y, min_y, max_y, image_start_pos_y, image_start_pos_y + scaled_image_h) );
                 
                 ofLine(center_tex.x, center_tex.y, o.x, o.y);
             }
