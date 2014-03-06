@@ -29,6 +29,7 @@ public:
     ofTexture texture;
     
     float min_x, min_y, max_x, max_y;
+    float center_diff_x, center_diff_y;
     
 	void setup(ofxBox2d &world, float cx, float cy, ofxSVG * _svg, ofImage * _image) {
         svg = _svg;
@@ -85,26 +86,43 @@ public:
         float scaled_image_w;
         float scaled_image_h;
         
-        float scale = rh / rw;
-        
-        if(ih < iw) {
-            scaled_image_h = ih;
-            scaled_image_w = iw * scale;
+        float scale;
+        if(rh < rw) {
+            float scale = rh / rw;
+            if(iw * scale < ih) {
+                scaled_image_h = iw * scale;
+                scaled_image_w = iw;
+                image_start_pos_x = 0;
+                image_start_pos_y = (ih - scaled_image_h) / 2.0;
+            } else {
+                scaled_image_h = ih;
+                scaled_image_w = ih / scale;
+                image_start_pos_x = (iw - scaled_image_w) / 2.0;
+                image_start_pos_y = 0;
+            }
         } else {
-            scaled_image_w = iw;
-            scaled_image_h = ih * scale;
+            float scale = rw / rh;
+            if(ih * scale < iw) {
+                scaled_image_w = ih * scale;
+                scaled_image_h = ih;
+                image_start_pos_x = (iw - scaled_image_w) / 2.0;
+                image_start_pos_y = 0;
+            } else {
+                scaled_image_w = iw;
+                scaled_image_h = iw / scale;
+                image_start_pos_x = 0;
+                image_start_pos_y = (ih - scaled_image_h) / 2.0;
+            }
         }
+    
         
         ofPoint center = polyShape.getCentroid2D();
-        ofPoint center_tex = ofPoint(scaled_image_w/2.0, scaled_image_h/2.0);
-        
-//        printf("image %f, %f scale : %f\n", scaled_image_w, scaled_image_h, scale);
-//        printf("m %f, %f %f, %f\n", min_x, max_x, min_y, max_y);
+        ofPoint center_tex = ofPoint(iw/2.0, ih/2.0);
         
         for(int i=0; i<points.size(); i++) {
             ofPoint p = points[i];
-            float x1 = ofMap(p.x, min_x, max_x, 0, scaled_image_w);
-            float y1 = ofMap(p.y, min_y, max_y, 0, scaled_image_h);
+            float x1 = ofMap(p.x, min_x, max_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
+            float y1 = ofMap(p.y, min_y, max_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
             ofPoint o = ofPoint(x1, y1);
             
             mesh.addVertex(center);
@@ -122,10 +140,9 @@ public:
         
         mesh.addTexCoord(center_tex);
         ofPoint p = points.front();
-        float x1 = ofMap(p.x, min_x, max_x, image_start_pos_x, scaled_image_w);
-        float y1 = ofMap(p.y, min_y, max_y, image_start_pos_y, scaled_image_h);
-        ofPoint o = ofPoint(x1, (scaled_image_h - y1));
-        mesh.addTexCoord(o);
+        float x1 = ofMap(p.x, min_x, max_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
+        float y1 = ofMap(p.y, min_y, max_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
+        mesh.addTexCoord(ofPoint(x1, y1));
         
         polyShape.setPhysics(10, 0.3, 0.1);
     	polyShape.create(world.getWorld());
@@ -136,7 +153,19 @@ public:
         
         vector<ofPoint> &pts = polyShape.getPoints();
         
-        ofPoint center = polyShape.getCentroid2D();
+        min_x = 100000;
+        min_y = 100000;
+        max_x = -1;
+        max_y = -1;
+        for(int i=0;i<pts.size(); i++) {
+            ofPoint point = pts[i];
+            if(point.x < min_x ) min_x = point.x;
+            if(point.y < min_y ) min_y = point.y;
+            if(max_x < point.x) max_x = point.x;
+            if(max_y < point.y) max_y = point.y;
+        }
+        
+        ofPoint center =  polyShape.getCentroid2D(); // ofPoint(min_x + (max_x - min_x) / 2.0, min_y + (max_y - min_y) / 2.0);
         
         for (int i=0; i<pts.size(); i++) {
             mesh.addVertex(center);
@@ -165,7 +194,6 @@ public:
             float rw = max_x - min_x;
             float rh = max_y - min_y;
             
-            float scale = rh / rw;
             
             float image_start_pos_x = 0;
             float image_start_pos_y = 0;
@@ -173,15 +201,22 @@ public:
             float scaled_image_w;
             float scaled_image_h;
             
-            if(ih < iw) {
-                scaled_image_h = ih * scale;
-                scaled_image_w = iw;
-                image_start_pos_y = ih - scaled_image_h;
+            float scale;
+            if(rh < rw) {
+                float scale = rh / rw;
             } else {
-                scaled_image_w = iw * scale;
-                scaled_image_h = ih;
-                image_start_pos_x = iw - scaled_image_w;
+                float scale = rw / rh;
             }
+            
+            if(ih < iw) {
+                scaled_image_h = ih;
+                scaled_image_w = iw * scale;
+            } else {
+                scaled_image_w = iw;
+                scaled_image_h = ih * scale;
+            }
+
+            
             ofPoint center_tex = ofPoint(scaled_image_w/2.0, scaled_image_h/2.0);
             ofRect(0, 0, scaled_image_w, scaled_image_h);
             
@@ -192,17 +227,20 @@ public:
                 ofLine(center_tex.x, center_tex.y, o.x, o.y);
             }
             
-            ofPoint prevPoint;
+            
+            
+            
+            
+            ofVec2f prevPoint;
             bool isFirst = true;
-            for(int i=1;i<points.size();i++) {
-                ofPoint p = ofPoint(points[i].x, points[i].y);
-                ofPoint o = ofPoint(ofMap(p.x, min_x, max_x, 0, scaled_image_w) , ofMap(p.y, min_y, max_y, 0, scaled_image_h) );
-                
+            for(int i=0; i < mesh.getTexCoords().size();i++) {
+                ofVec2f p = mesh.getTexCoords()[i];
+
                 if(!isFirst) {
-                    ofLine(prevPoint.x, prevPoint.y, o.x, o.y);
-                }
+                    ofLine(prevPoint.x, prevPoint.y, p.x, p.y);
+                } 
                 
-                prevPoint = o;
+                prevPoint = p;
                 isFirst = false;
             }
             
