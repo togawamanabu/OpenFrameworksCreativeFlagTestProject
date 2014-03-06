@@ -10,8 +10,7 @@ class testApp : public ofBaseApp{
 public:
     void setup();
     void update();
-    void draw();
-    
+    void draw();    
     ofShader shader;	//Shader
 	ofFbo fbo;			//First buffer for input image
 	ofFbo fbo2;			//Second buffer for mask
@@ -31,7 +30,8 @@ public:
     vector <ofxSVG> rockSvgs;
     
     ofxBox2d box2d;
-        
+    
+    
     
     void keyPressed(int key);
     void keyReleased(int key);

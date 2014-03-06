@@ -130,18 +130,20 @@ public:
             mesh.addVertex(center);
             mesh.addVertex(p);
             
-            mesh.addTexCoord(center_tex);
-            mesh.addTexCoord(o);
+//            mesh.addTexCoord(center_tex);
+//            mesh.addTexCoord(o);
 
         }
         mesh.addVertex(center);
         mesh.addVertex(points.front());
         
-        mesh.addTexCoord(center_tex);
-        ofPoint p = points.front();
-        float x1 = ofMap(p.x - min_x, 0, max_x - min_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
-        float y1 = ofMap(p.y - min_y, 0, max_y - min_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
-        mesh.addTexCoord(ofPoint(x1, y1));
+//        mesh.addTexCoord(center_tex);
+//        ofPoint p = points.front();
+//        float x1 = ofMap(p.x - min_x, 0, max_x - min_x, image_start_pos_x, image_start_pos_x + scaled_image_w);
+//        float y1 = ofMap(p.y - min_y, 0, max_y - min_y, image_start_pos_y, image_start_pos_y + scaled_image_h);
+//        mesh.addTexCoord(ofPoint(x1, y1));
+        
+        createTextureMap();
         
         polyShape.setPhysics(10, 0.3, 0.1);
     	polyShape.create(world.getWorld());
@@ -226,10 +228,6 @@ public:
                 ofLine(center_tex.x, center_tex.y, o.x, o.y);
             }
             
-            
-            
-            
-            
             ofVec2f prevPoint;
             bool isFirst = true;
             for(int i=0; i < mesh.getTexCoords().size();i++) {
@@ -248,6 +246,90 @@ public:
         
 //        ofPoint screenCenter = ofPoint(ofGetWidth() / 2.0, ofGetHeight() / 2.0);
 //        ofLine(screenCenter.x, screenCenter.y, center.x, center.y);
+        
+    }
+    
+    
+    void createTextureMap() {
+        mesh.clearTexCoords();
+        
+        vector<ofPoint> &pts = polyShape.getPoints();
+        ofPoint vecCenter = polyShape.getCentroid2D();
+        float min_x = 10000;
+        float max_x = -1;
+        float min_y = 100000;
+        float max_y = -1;
+        float min_dist = 100000;
+        float max_dist =-1;
+        for(int i=0; i<pts.size(); i++) {
+            ofPoint p = pts[i];
+            float d = (p.x - vecCenter.x)*(p.x - vecCenter.x) + (p.y - vecCenter.y)*(p.y - vecCenter.y);
+            
+            if(p.x < min_x ) min_x = p.x;
+            if(p.y < min_y ) min_y = p.y;
+            if(max_x < p.x) max_x = p.x;
+            if(max_y < p.y) max_y = p.y;
+            if(d < min_dist) min_dist = d;
+            if(max_dist < d) max_dist = d;
+        }
+        
+        float rw = max_x - min_x;
+        float rh = max_y - min_y;
+        
+        float iw = texture.getWidth();
+        float ih = texture.getHeight();
+        
+        float angle = 0;
+        if(rh < rw ) {
+            if(iw < ih) {
+                angle = 90 * PI / 180.0;
+            }
+        } else {
+            if(ih < iw) {
+                angle = 90 * PI / 180.0;
+            }
+        }
+        
+        float aspect;
+        if(rh < rw) {
+            float aspect = rh / rw;
+        } else {
+            float aspect = rw / rh;
+        }
+        
+        float scaled_image_h, scaled_image_w;
+        float scale;
+        if(ih < iw) {
+            scale = ih / rh;
+        } else {
+            scale = iw / rw;
+        }
+        
+        
+        ofPoint texCenter = ofPoint(iw/2.0, ih/2.0);
+        for(int i=0; i<pts.size(); i++) {
+            ofPoint p = pts[i];
+            float dx = p.x- vecCenter.x;
+            float dy = p.y - vecCenter.y;
+            float d = sqrt(dx*dx + dy*dy);
+            float t = atan( dy / dx );
+            float deg = 180.0 * t / PI;
+            
+            float x = cos(t) * d;
+            float y = sin(t) * d;
+            
+            
+            float tx = texCenter.x + ofMap(x, -rw/2.0, rw/2.0, -iw/2.0, iw/2.0);
+            float ty = texCenter.y + ofMap(y, -rh/2.0, rh/2.0, -ih/2.0, ih/2.0);
+            
+            mesh.addTexCoord(texCenter);
+            mesh.addTexCoord(ofPoint(tx, ty));
+        }
+        
+        
+    }
+    
+    void setTexture() {
         
     }
     

@@ -47,7 +47,7 @@ void testApp::setup(){
     
     
     //draw first rocks
-    for(int i=0; i<15; i++) {
+    for(int i=0; i<1; i++) {
         int x = ofRandom(ofGetWidth()/2.0, ofGetWidth()-50);
         rocks.push_back(ofPtr<RockShape>(new RockShape));
         rocks.back().get()->setup(box2d, x, 0, &rockSvgs[(int)ofRandom(rockSvgs.size())], &images[(int)ofRandom(images.size())]);
