@@ -49,7 +49,7 @@ public:
                 ofPolyline pl = vpl[z];
                 vector<ofPoint> vp = pl.getVertices();
                 
-                int step = vp.size() / 20; //TODO:20
+                int step = vp.size() / 8; //TODO:20
                 
                 for(int x=0; x<vp.size(); x = x+step) {
                     float d = ofRandom(0, 20);
@@ -198,32 +198,25 @@ public:
         float iw = texture.getWidth();
         float ih = texture.getHeight();
         
-        float angle = 0;
-        if(rh < rw ) {
-            if(iw < ih) {
-                angle = 90 * PI / 180.0;
-            }
-        } else {
-            if(ih < iw) {
-                angle = 90 * PI / 180.0;
-            }
-        }
+        float scaled_h, scaled_w;
         
-        float aspect;
-        if(rh < rw) {
-            float aspect = rh / rw;
-        } else {
-            float aspect = rw / rh;
-        }
-        
-        float scaled_image_h, scaled_image_w;
-        float scale;
         if(ih < iw) {
-            scale = ih / rh;
+            float s = rh/rw;
+            scaled_w = iw;
+            scaled_h = iw * s;
+            if(ih < scaled_h) {
+                scaled_w = ih/s;
+                scaled_h = ih;
+            }
         } else {
-            scale = iw / rw;
+            float s = rw/rh;
+            scaled_h = ih;
+            scaled_w = ih * s;
+            if(iw < scaled_w) {
+                scaled_w = iw;
+                scaled_h = iw/s;
+            }
         }
-        
         
         ofPoint texCenter = ofPoint(iw/2.0, ih/2.0);
         for(int i=0; i<pts.size(); i++) {
@@ -238,8 +231,8 @@ public:
 //            float y = dy; //sin(t) * d ;
             
             
-            float tx = texCenter.x + ofMap(dx, -rw/2.0, rw/2.0, -iw/2.0, iw/2.0);
-            float ty = texCenter.y + ofMap(dy, -rh/2.0, rh/2.0, -ih/2.0, ih/2.0);
+            float tx = texCenter.x + ofMap(dx, -rw/2.0, rw/2.0, -scaled_w/2.0, scaled_w/2.0);
+            float ty = texCenter.y + ofMap(dy, -rh/2.0, rh/2.0, -scaled_h/2.0, scaled_h/2.0);
             
             mesh.addTexCoord(texCenter);
             mesh.addTexCoord(ofPoint(tx, ty));
@@ -248,8 +241,8 @@ public:
         ofPoint p = pts.front();
         float dx = (p.x- vecCenter.x)/2.0;
         float dy = (p.y - vecCenter.y)/2.0;
-        float tx = texCenter.x + ofMap(dx, -rw/2.0, rw/2.0, -iw/2.0, iw/2.0);
-        float ty = texCenter.y + ofMap(dy, -rh/2.0, rh/2.0, -ih/2.0, ih/2.0);
+        float tx = texCenter.x + ofMap(dx, -rw/2.0, rw/2.0, -scaled_w/2.0, scaled_w/2.0);
+        float ty = texCenter.y + ofMap(dy, -rh/2.0, rh/2.0, -scaled_h/2.0, scaled_h/2.0);
         mesh.addTexCoord(texCenter);
         mesh.addTexCoord(ofPoint(tx, ty));
         
